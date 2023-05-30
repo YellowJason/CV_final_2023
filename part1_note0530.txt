@@ -13,3 +13,5 @@ filter_keypoints.py:
 直行比較穩定，但近處還是會消失。
 
 需要測試用作業三的變換矩陣，將前後frame的corners.npy變換到主frame座標後再餵給modify_matrix(A, B)濾。
+
+我把四個影片分開寫，調整測試的時候可以先註解掉其他三個，測試一個影片的結果就好
