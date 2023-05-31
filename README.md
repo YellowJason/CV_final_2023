@@ -1,10 +1,10 @@
 # CV_final_2023
-Computer vision final project in NTU, 2023
+Computer vision final project in NTU, 2023  
 Remember to put ITRI_dataset & ITRI_DLC two folder under CV_final_2023/
 
 ## Usage
 * 找角點: python find_corners.py --seq {seq_num}
-* 過濾角點: python write_timestamp.py
+* 過濾角點: python write_timestamp.py  
            python filter_keypoints.py
 
 ## Progress
