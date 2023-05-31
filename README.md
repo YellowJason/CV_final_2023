@@ -8,7 +8,7 @@ Remember to put ITRI_dataset & ITRI_DLC two folder under CV_final_2023/
     python filter_keypoints.py
 
 ## Progress
-* 5/30 by 塗兆元
+* 5/30 by 塗兆元  
     write_timestamp:  
     把seq中的all_timestamp.txt切分成四個檔案，測試時比較好用(可只測f camera結果)  
     用法跟Test.py一樣  --seq seqX  
@@ -27,6 +27,6 @@ Remember to put ITRI_dataset & ITRI_DLC two folder under CV_final_2023/
       
     我把四個影片分開寫，調整測試的時候可以先註解掉其他三個，測試一個影片的結果就好  
 
-* 5/31 by 黃政勛
+* 5/31 by 黃政勛  
     更新filter_keypoints: 先對前後frame做perspective transform後再篩選標點  
     更新find_corners.py: 用threshold得到的mask，拿來過濾Canny edge結果，減少路面或陰影上的錯誤角點  
