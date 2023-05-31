@@ -19,10 +19,10 @@ def main():
 
     # Make video
     fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-    videowriter_f = cv2.VideoWriter(f"{seq_path}/marker_f.avi", fourcc, 24, (1440, 928))
-    videowriter_b = cv2.VideoWriter(f"{seq_path}/marker_b.avi", fourcc, 24, (1440, 928))
-    videowriter_fr = cv2.VideoWriter(f"{seq_path}/marker_fr.avi", fourcc, 24, (1440, 928))
-    videowriter_fl = cv2.VideoWriter(f"{seq_path}/marker_fl.avi", fourcc, 24, (1440, 928))
+    videowriter_f = cv2.VideoWriter(f"{seq_path}/marker_f.avi", fourcc, 10, (1440, 928))
+    videowriter_b = cv2.VideoWriter(f"{seq_path}/marker_b.avi", fourcc, 10, (1440, 928))
+    videowriter_fr = cv2.VideoWriter(f"{seq_path}/marker_fr.avi", fourcc, 10, (1440, 928))
+    videowriter_fl = cv2.VideoWriter(f"{seq_path}/marker_fl.avi", fourcc, 10, (1440, 928))
     # process img at each time stamp
     kernel = np.ones((3,3), np.uint8)
     for i in range(len(lines)):
@@ -55,31 +55,26 @@ def main():
         mask = cv2.dilate(mask, kernel, iterations = 3)
         cv2.imwrite(os.path.join(floder_path, 'mask.jpg'), mask)
         '''
-        # res = cv2.bitwise_and(gray, gray, mask=mask)
-        # Dilation & Erosion
-        # res = cv2.dilate(res, kernel, iterations = 2)
-        # res = cv2.erode(res, kernel, iterations = 2)
-        # res = cv2.erode(res, kernel, iterations = 2)
-        # res = cv2.dilate(res, kernel, iterations = 2)
-        # cv2.imwrite(os.path.join(floder_path, 'image_after_inRange.jpg'), res)
-        # Threshold
+        # Filter out white part by threshold
         gray = cv2.GaussianBlur(gray,(5,5), 0)
         # gray = xip.jointBilateralFilter(img, gray, 30, 5, 5)
         # cv2.imwrite(os.path.join(floder_path, 'gray_after_jbf.jpg'), gray)
-        '''
-        th = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
-        th = cv2.dilate(th, kernel, iterations = 1)
-        th = cv2.erode(th, kernel, iterations = 1)
-        # th = cv2.bitwise_and(th, th, mask=mask)
+        th = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 201, -20)
+        # ret, th = cv2.threshold(gray, 110, 255, cv2.THRESH_BINARY)
+        th = cv2.dilate(th, kernel, iterations = 2)
+        th = cv2.erode(th, kernel, iterations = 2)
+        th = cv2.erode(th, kernel, iterations = 2)
+        th = cv2.dilate(th, kernel, iterations = 2)
+        th = cv2.GaussianBlur(th,(7,7), 0)
         cv2.imwrite(os.path.join(floder_path, 'image_after_threshold.jpg'), th)
-        '''
+        
         # Canny
         canny = cv2.Canny(gray, 20, 90)
         canny = cv2.dilate(canny, kernel, iterations = 1)
         canny = cv2.erode(canny, kernel, iterations = 1)
         cv2.imwrite(os.path.join(floder_path, 'image_after_canny.jpg'), canny)
-        # canny = cv2.bitwise_and(canny, canny, mask=mask)
-        # cv2.imwrite(os.path.join(floder_path, 'image_after_canny_&_mask.jpg'), canny)
+        canny = cv2.bitwise_and(canny, canny, mask=th)
+        cv2.imwrite(os.path.join(floder_path, 'image_after_canny_&_mask.jpg'), canny)
 
         # read marker
         marker_f = open(os.path.join(floder_path, 'detect_road_marker.csv'), 'r')
@@ -99,7 +94,7 @@ def main():
 
                 img_box = canny[max(0,y1-20):min(h,y2+20), max(0,x1-20):min(w,x2+20)]
                 # find corner by findContours & approxPolyDP
-                _, contours, hierarchy = cv2.findContours(img_box, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+                contours, hierarchy = cv2.findContours(img_box, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
                 for i in range(len(contours)):
                     cnt = contours[i] # shape: (num, 1, 2)
                     min_d = 10

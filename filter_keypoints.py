@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 import argparse
 import os
-import csv
 
 def main():
     parser = argparse.ArgumentParser(description = 'Read dataset & marker')
@@ -23,110 +22,69 @@ def main():
 
     # Make video
     fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-
-    videowriter_f_filtered = cv2.VideoWriter(f"{seq_path}/marker_f_filtered.avi", fourcc, 24, (1440, 928))
-    videowriter_b_filtered = cv2.VideoWriter(f"{seq_path}/marker_b_filtered.avi", fourcc, 24, (1440, 928))
-    videowriter_fr_filtered = cv2.VideoWriter(f"{seq_path}/marker_fr_filtered.avi", fourcc, 24, (1440, 928))
-    videowriter_fl_filtered = cv2.VideoWriter(f"{seq_path}/marker_fl_filtered.avi", fourcc, 24, (1440, 928))
+    videowriter_f_filtered = cv2.VideoWriter(f"{seq_path}/marker_f_filtered.avi", fourcc, 10, (1440, 928))
+    videowriter_b_filtered = cv2.VideoWriter(f"{seq_path}/marker_b_filtered.avi", fourcc, 10, (1440, 928))
+    videowriter_fr_filtered = cv2.VideoWriter(f"{seq_path}/marker_fr_filtered.avi", fourcc, 10, (1440, 928))
+    videowriter_fl_filtered = cv2.VideoWriter(f"{seq_path}/marker_fl_filtered.avi", fourcc, 10, (1440, 928))
  
-    
-    for i in range(1, len(lines_f) - 1, 1):
-        front_frame_now = os.path.join(seq_path, 'dataset', lines_f[i][:-1])
-        front_frame_former1 = os.path.join(seq_path, 'dataset', lines_f[i - 1][:-1])
-        front_frame_later1 = os.path.join(seq_path, 'dataset', lines_f[i + 1][:-1])
-        print('\r', end='')
-        print(f'f_Processing {i+1}/{len(lines_f)}', end='')
+    files = [lines_f, lines_b, lines_fr, lines_fl]
+    name = ['f', 'b', 'fr', 'fl']
+    writers = [videowriter_f_filtered, videowriter_b_filtered, videowriter_fr_filtered, videowriter_fl_filtered]
+    for j in range(4):
+        for i in range(1, len(files[j]) - 1, 1):
+            frame_now = os.path.join(seq_path, 'dataset', files[j][i][:-1])
+            frame_former1 = os.path.join(seq_path, 'dataset', files[j][i - 1][:-1])
+            frame_later1 = os.path.join(seq_path, 'dataset', files[j][i + 1][:-1])
+            print('\r', end='')
+            print(f'{name[j]}_Processing {i+1}/{len(files[j])}', end='')
 
-        corners_n = np.load(os.path.join(front_frame_now, 'corners.npy'))
-        corners_f1 = np.load(os.path.join(front_frame_former1, 'corners.npy'))
-        corners_l1 = np.load(os.path.join(front_frame_later1, 'corners.npy'))
+            corners_n = np.load(os.path.join(frame_now, 'corners.npy'))
+            corners_f1 = np.load(os.path.join(frame_former1, 'corners.npy'))
+            corners_l1 = np.load(os.path.join(frame_later1, 'corners.npy'))
+            # use raw data for perspective transform
+            raw_n = cv2.imread(os.path.join(frame_now, 'raw_image.jpg')).astype('uint8')
+            raw_f1 = cv2.imread(os.path.join(frame_former1, 'raw_image.jpg')).astype('uint8')
+            raw_l1 = cv2.imread(os.path.join(frame_later1, 'raw_image.jpg')).astype('uint8')
+            H_f1_to_n, img_f1_to_n, corners_f1_to_n = img_transform(raw_f1, raw_n, corners_f1)
+            # cv2.imwrite(os.path.join(frame_now, 'image_after_forward_f1.jpg'), img_f1_to_n)
+            H_l1_to_n, img_l1_to_n, corners_l1_to_n = img_transform(raw_l1, raw_n, corners_l1)
+            # cv2.imwrite(os.path.join(frame_now, 'image_after_forward_l1.jpg'), img_l1_to_n)
 
-        out = modify_matrix(corners_f1, corners_n)
-        out = modify_matrix(corners_l1, out)
+            out = modify_matrix(np.logical_or(corners_f1_to_n, corners_l1_to_n), corners_n)
 
-        img = cv2.imread(os.path.join(front_frame_now, 'raw_image.jpg')).astype('uint8')
-        true_coordinates = np.argwhere(out)
-        true_coordinates_tuples = [tuple(coordinate) for coordinate in true_coordinates]
-        for coordinate in true_coordinates_tuples:
-            swap = (coordinate[1], coordinate[0])
-            cv2.circle(img, swap, 2, (0, 0, 255), -1)
-        
-        videowriter_f_filtered.write(img)
-
-    for i in range(1, len(lines_b) - 1, 1):
-        front_frame_now = os.path.join(seq_path, 'dataset', lines_b[i][:-1])
-        front_frame_former1 = os.path.join(seq_path, 'dataset', lines_b[i - 1][:-1])
-        front_frame_later1 = os.path.join(seq_path, 'dataset', lines_b[i + 1][:-1])
-        print('\r', end='')
-        print(f'b_Processing {i+1}/{len(lines_b)}', end='')
-
-        corners_n = np.load(os.path.join(front_frame_now, 'corners.npy'))
-        corners_f1 = np.load(os.path.join(front_frame_former1, 'corners.npy'))
-        corners_l1 = np.load(os.path.join(front_frame_later1, 'corners.npy'))
-
-        out = modify_matrix(corners_f1, corners_n)
-        out = modify_matrix(corners_l1, out)
-
-        img = cv2.imread(os.path.join(front_frame_now, 'raw_image.jpg')).astype('uint8')
-        true_coordinates = np.argwhere(out)
-        true_coordinates_tuples = [tuple(coordinate) for coordinate in true_coordinates]
-        for coordinate in true_coordinates_tuples:
-            swap = (coordinate[1], coordinate[0])
-            cv2.circle(img, swap, 2, (0, 0, 255), -1)
-        
-        videowriter_b_filtered.write(img)
-
-    for i in range(1, len(lines_fr) - 1, 1):
-        front_frame_now = os.path.join(seq_path, 'dataset', lines_fr[i][:-1])
-        front_frame_former1 = os.path.join(seq_path, 'dataset', lines_fr[i - 1][:-1])
-        front_frame_later1 = os.path.join(seq_path, 'dataset', lines_fr[i + 1][:-1])
-        print('\r', end='')
-        print(f'frProcessing {i+1}/{len(lines_fr)}', end='')
-
-        corners_n = np.load(os.path.join(front_frame_now, 'corners.npy'))
-        corners_f1 = np.load(os.path.join(front_frame_former1, 'corners.npy'))
-        corners_l1 = np.load(os.path.join(front_frame_later1, 'corners.npy'))
-
-        out = modify_matrix(corners_f1, corners_n)
-        out = modify_matrix(corners_l1, out)
-
-        img = cv2.imread(os.path.join(front_frame_now, 'raw_image.jpg')).astype('uint8')
-        true_coordinates = np.argwhere(out)
-        true_coordinates_tuples = [tuple(coordinate) for coordinate in true_coordinates]
-        for coordinate in true_coordinates_tuples:
-            swap = (coordinate[1], coordinate[0])
-            cv2.circle(img, swap, 2, (0, 0, 255), -1)
-        
-        videowriter_fr_filtered.write(img)
-
-    for i in range(1, len(lines_fl) - 1, 1):
-        front_frame_now = os.path.join(seq_path, 'dataset', lines_fl[i][:-1])
-        front_frame_former1 = os.path.join(seq_path, 'dataset', lines_fl[i - 1][:-1])
-        front_frame_later1 = os.path.join(seq_path, 'dataset', lines_fl[i + 1][:-1])
-        print('\r', end='')
-        print(f'fl_Processing {i+1}/{len(lines_fl)}', end='')
-
-        corners_n = np.load(os.path.join(front_frame_now, 'corners.npy'))
-        corners_f1 = np.load(os.path.join(front_frame_former1, 'corners.npy'))
-        corners_l1 = np.load(os.path.join(front_frame_later1, 'corners.npy'))
-
-        out = modify_matrix(corners_f1, corners_n)
-        out = modify_matrix(corners_l1, out)
-
-        img = cv2.imread(os.path.join(front_frame_now, 'raw_image.jpg')).astype('uint8')
-        true_coordinates = np.argwhere(out)
-        true_coordinates_tuples = [tuple(coordinate) for coordinate in true_coordinates]
-        for coordinate in true_coordinates_tuples:
-            swap = (coordinate[1], coordinate[0])
-            cv2.circle(img, swap, 2, (0, 0, 255), -1)
-        
-        videowriter_fl_filtered.write(img)
-        
-
-    videowriter_f_filtered.release()
-    videowriter_b_filtered.release()
-    videowriter_fr_filtered.release()
-    videowriter_fl_filtered.release()
+            img = cv2.imread(os.path.join(frame_now, 'raw_image.jpg')).astype('uint8')
+            img_video = cv2.imread(os.path.join(frame_now, 'raw_image.jpg')).astype('uint8')
+            # plot original corners
+            true_coordinates = np.argwhere(corners_n)
+            true_coordinates_tuples = [tuple(coordinate) for coordinate in true_coordinates]
+            for coordinate in true_coordinates_tuples:
+                swap = (coordinate[1], coordinate[0])
+                cv2.circle(img, swap, 4, (0, 0, 255), -1)
+                cv2.circle(img_video, swap, 4, (0, 0, 255), -1)
+            # Plot filtered corners
+            true_coordinates = np.argwhere(out)
+            np.save(os.path.join(frame_now, 'filtered_corners_(y,x).npy'), true_coordinates)
+            true_coordinates_tuples = [tuple(coordinate) for coordinate in true_coordinates]
+            for coordinate in true_coordinates_tuples:
+                swap = (coordinate[1], coordinate[0])
+                cv2.circle(img, swap, 2, (0, 255, 255), -1)
+                cv2.circle(img_video, swap, 2, (0, 255, 255), -1)
+            # plot corners of former frame
+            true_coordinates = np.argwhere(corners_f1_to_n)
+            true_coordinates_tuples = [tuple(coordinate) for coordinate in true_coordinates]
+            for coordinate in true_coordinates_tuples:
+                swap = (coordinate[1], coordinate[0])
+                cv2.circle(img, swap, 2, (0, 255, 0), -1)
+            # plot corners of later frame
+            true_coordinates = np.argwhere(corners_l1_to_n)
+            true_coordinates_tuples = [tuple(coordinate) for coordinate in true_coordinates]
+            for coordinate in true_coordinates_tuples:
+                swap = (coordinate[1], coordinate[0])
+                cv2.circle(img, swap, 2, (255, 0, 0), -1)
+            cv2.imwrite(os.path.join(frame_now, 'image_3_corners.jpg'), img)
+            writers[j].write(img_video)
+        print('')
+        writers[j].release()
 
 def modify_matrix(A, B):
     rows, cols = A.shape
@@ -147,6 +105,70 @@ def modify_matrix(A, B):
             result[i, j] = False
     
     return result
+
+# perspective transform from img1 to img2
+def img_transform(img1, img2, corners1):
+    MIN_MATCH_COUNT = 10
+    h, w, c = img1.shape
+
+    # Initiate detector
+    orb = cv2.ORB_create()
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+    
+    # find the keypoints and descriptors with SIFT
+    kp1, des1 = orb.detectAndCompute(img1,None)
+    kp2, des2 = orb.detectAndCompute(img2,None)
+    matches = bf.knnMatch(des1, des2, k=2)
+
+    # store all the good matches as per Lowe's ratio test.
+    good = []
+    
+    for m,n in matches:
+        if m.distance < 0.7*n.distance:
+            good.append(m)
+    if len(good)>MIN_MATCH_COUNT:
+        src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
+        dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
+    
+        H, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 4.0)
+        matchesMask = mask.ravel().tolist()
+        h,w,c = img1.shape
+        # pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
+        # dst = cv2.perspectiveTransform(pts,H)
+        
+        # img2 = cv2.polylines(img2,[np.int32(dst)],True,255,3, cv2.LINE_AA)
+        
+    else:
+        print("Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT))
+        matchesMask = None
+
+    ##################
+    # draw_params = dict(matchColor = (0,255,0), # draw matches in green color
+    #                singlePointColor = None,
+    #                matchesMask = matchesMask, # draw only inliers
+    #                flags = 2)
+    # img_match_points = cv2.drawMatches(img1,kp1,img2,kp2,good,None,**draw_params)
+    ##################
+    
+    out_img = np.zeros((h,w,c))
+    out_corners = np.zeros((h,w)).astype(bool)
+    xc, yc = np.meshgrid(np.arange(0, w, 1), np.arange(0, h, 1), sparse = False)
+    xrow = xc.reshape((w*h, 1, 1))
+    yrow = yc.reshape((w*h, 1, 1))
+    pts = np.concatenate((xrow, yrow), axis = 2).astype(float)
+    dst = cv2.perspectiveTransform(pts, H)
+    
+    dsty = np.round(dst[:, :, 1].reshape(h, w)).astype(int)
+    dstx = np.round(dst[:, :, 0].reshape(h, w)).astype(int)
+    
+    h_mask = (0<=dsty)*(dsty<h)
+    w_mask = (0<=dstx)*(dstx<w)
+    mask   = h_mask*w_mask
+    out_img[dsty[mask], dstx[mask]] = img1[yc[mask], xc[mask]]
+    out_corners[dsty[mask], dstx[mask]] = corners1[yc[mask], xc[mask]]
+
+    return H, out_img, out_corners
+
 
 if __name__ == '__main__':
     main()
