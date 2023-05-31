@@ -31,6 +31,30 @@ def main():
     name = ['f', 'b', 'fr', 'fl']
     writers = [videowriter_f_filtered, videowriter_b_filtered, videowriter_fr_filtered, videowriter_fl_filtered]
     for j in range(4):
+        #fullfill frame 1
+        print('\r', end='')
+        print(f'{name[j]}_Processing 1/{len(files[j])}', end='')
+        frame_1 = os.path.join(seq_path, 'dataset', files[j][0][:-1])
+        frame_2 = os.path.join(seq_path, 'dataset', files[j][1][:-1])
+
+        corners_1 = np.load(os.path.join(frame_1, 'corners.npy'))
+        corners_2 = np.load(os.path.join(frame_2, 'corners.npy'))
+
+        raw_1 = cv2.imread(os.path.join(frame_1, 'raw_image.jpg')).astype('uint8')
+        raw_2 = cv2.imread(os.path.join(frame_2, 'raw_image.jpg')).astype('uint8')
+
+        _, _, corners_2_to_1 = img_transform(raw_2, raw_1, corners_2)
+        filtered_1 = modify_matrix(corners_2_to_1, corners_1)
+        img_video_1 = raw_1
+        true_coordinates_1 = np.argwhere(filtered_1)
+        np.save(os.path.join(frame_1, 'filtered_corners_(y,x).npy'), true_coordinates_1)
+        true_coordinates_tuples_1 = [tuple(coordinate) for coordinate in true_coordinates_1]
+        for coordinate in true_coordinates_tuples_1:
+            swap = (coordinate[1], coordinate[0])
+            cv2.circle(img_video_1, swap, 2, (0, 255, 255), -1)
+        writers[j].write(img_video_1)
+
+        # for loop frame 2 to last2    
         for i in range(1, len(files[j]) - 1, 1):
             frame_now = os.path.join(seq_path, 'dataset', files[j][i][:-1])
             frame_former1 = os.path.join(seq_path, 'dataset', files[j][i - 1][:-1])
@@ -49,7 +73,7 @@ def main():
             # cv2.imwrite(os.path.join(frame_now, 'image_after_forward_f1.jpg'), img_f1_to_n)
             H_l1_to_n, img_l1_to_n, corners_l1_to_n = img_transform(raw_l1, raw_n, corners_l1)
             # cv2.imwrite(os.path.join(frame_now, 'image_after_forward_l1.jpg'), img_l1_to_n)
-
+            
             out = modify_matrix(np.logical_or(corners_f1_to_n, corners_l1_to_n), corners_n)
 
             img = cv2.imread(os.path.join(frame_now, 'raw_image.jpg')).astype('uint8')
@@ -83,6 +107,30 @@ def main():
                 cv2.circle(img, swap, 2, (255, 0, 0), -1)
             cv2.imwrite(os.path.join(frame_now, 'image_3_corners.jpg'), img)
             writers[j].write(img_video)
+
+        #fullfill frame Last1
+        print('\r', end='')
+        print(f'{name[j]}_Processing {len(files[j])}/{len(files[j])}', end='')
+        frame_last1 = os.path.join(seq_path, 'dataset', files[j][-1][:-1])
+        frame_last2 = os.path.join(seq_path, 'dataset', files[j][-2][:-1])
+
+        corners_last1 = np.load(os.path.join(frame_last1, 'corners.npy'))
+        corners_last2 = np.load(os.path.join(frame_last2, 'corners.npy'))
+
+        raw_last1 = cv2.imread(os.path.join(frame_last1, 'raw_image.jpg')).astype('uint8')
+        raw_last2 = cv2.imread(os.path.join(frame_last2, 'raw_image.jpg')).astype('uint8')
+
+        _, _, corners_L2_to_L1 = img_transform(raw_last2, raw_last1, corners_last2)
+        filtered_last1 = modify_matrix(corners_L2_to_L1, corners_last1)
+        img_video_last1 = raw_last1
+        true_coordinates_last1 = np.argwhere(filtered_last1)
+        np.save(os.path.join(frame_last1, 'filtered_corners_(y,x).npy'), true_coordinates_last1)
+        true_coordinates_tuples_last1 = [tuple(coordinate) for coordinate in true_coordinates_last1]
+        for coordinate in true_coordinates_tuples_last1:
+            swap = (coordinate[1], coordinate[0])
+            cv2.circle(img_video_last1, swap, 2, (0, 255, 255), -1)
+        writers[j].write(img_video_last1)
+
         print('')
         writers[j].release()
 
