@@ -34,4 +34,7 @@ Remember to put ITRI_dataset & ITRI_DLC two folder under CV_final_2023/
 
 * 5/31 by 黃政勛  
     更新filter_keypoints: 先對前後frame做perspective transform後再篩選標點  
-    更新find_corners.py: 用threshold得到的mask，拿來過濾Canny edge結果，減少路面或陰影上的錯誤角點  
+    更新find_corners.py: 用threshold得到的mask，拿來過濾Canny edge結果，減少路面或陰影上的錯誤角點
+    
+    by 塗兆元
+    更新第一幀與最後一幀，分別用第二幀與倒數第二幀來filter
