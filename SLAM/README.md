@@ -1,14 +1,65 @@
+# CV Final
+
 # SLAM
-#### Simultaneous localization and mapping
 
-![](output/slam_frame.png)
-### point cloud using open3d
-![](output/slam_open3d.png)
-### point cloud using matplotlib
-![](output/slam_plt.png)
+- Simultaneous localization and mapping
+- [https://zhuanlan.zhihu.com/p/538017402](https://zhuanlan.zhihu.com/p/538017402) Read **Epipolar Geometry** for details
+- Utilize current frame and last frame
+    1. Expand into 3 dimensions
+    2. **Feature Detection, Extraction and Matching**
+    3. Compute transformation matrix and mapping
+    4. Compute **Essential matrix**
+    5. Perform SVD and compute **P**
+    6. Map into real 3D space using **Triangulation**
 
-## Libraries used
-* [opencv](https://opencv.org/)
-* [numpy](https://numpy.org/)
-* [open3d](http://www.open3d.org/)
-* [matplotlib](https://matplotlib.org/)
+# Package Download
+
+- pip install -r requirements.txt
+
+# File Description
+
+### converter.py
+
+Convert array from 2d to 3d
+
+### eval.py
+
+Currently only evaluate seq1 result
+
+### extractor.py
+
+Road marker key points detection
+
+### gt_gen.py
+
+Make gt_pose.txt for evaluation
+
+### ICP.py
+
+Run ICP to obtain x,y of all local timestamps
+
+### main.py
+
+- Currently, only seq1 is computed
+- Every camera is independent
+
+### normalize.py
+
+Functions for step 4,5,6
+
+### pointmap.py
+
+Map result array into 3d coord (x,y,z)
+
+# Current Result
+
+- seq1 Mean Square Error: 0.22674
+
+# Future Work
+
+- Use ROS to process images captured by different camera **simultaneously**
+- Integrate **road marker points capture** and replace current extractor
+- Revisit SLAM to use **multiple frames** instead of two (e.g. range within 25 frames)
+- Other Improvements and test submission
+
+# **NEED MORE IMPROVEMENTS !!!!**
