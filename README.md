@@ -34,7 +34,11 @@ Remember to put ITRI_dataset & ITRI_DLC two folder under CV_final_2023/
 
 * 5/31 by 黃政勛  
     更新filter_keypoints: 先對前後frame做perspective transform後再篩選標點  
-    更新find_corners.py: 用threshold得到的mask，拿來過濾Canny edge結果，減少路面或陰影上的錯誤角點
+    更新find_corners.py: 用threshold得到的mask，拿來過濾Canny edge結果，減少路面或陰影上的錯誤角點  
     
-    by 塗兆元
-    更新第一幀與最後一幀，分別用第二幀與倒數第二幀來filter
+    by 塗兆元  
+    更新第一幀與最後一幀，分別用第二幀與倒數第二幀來filter  
+
+* 6/2 by 黃政勛  
+    將find_corners.py找出的角點合併到SLAM中，SLAM維持原本用兩幀的goodFeatures來找2D->3D的轉換關係，但輸出點雲只輸出corners轉換後的結果(原本是把所有goodFeatures轉過去)。依然有一些問題待解決
+    
