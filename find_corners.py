@@ -59,17 +59,17 @@ def main():
         gray = cv2.GaussianBlur(gray,(5,5), 0)
         # gray = xip.jointBilateralFilter(img, gray, 30, 5, 5)
         # cv2.imwrite(os.path.join(floder_path, 'gray_after_jbf.jpg'), gray)
-        th = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 201, -20)
+        th = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 121, -10)
         # ret, th = cv2.threshold(gray, 110, 255, cv2.THRESH_BINARY)
         th = cv2.dilate(th, kernel, iterations = 2)
         th = cv2.erode(th, kernel, iterations = 2)
         th = cv2.erode(th, kernel, iterations = 2)
-        th = cv2.dilate(th, kernel, iterations = 2)
-        th = cv2.GaussianBlur(th,(7,7), 0)
+        th = cv2.dilate(th, kernel, iterations = 5)
+        # th = cv2.GaussianBlur(th,(7,7), 0)
         cv2.imwrite(os.path.join(floder_path, 'image_after_threshold.jpg'), th)
         
         # Canny
-        canny = cv2.Canny(gray, 20, 90)
+        canny = cv2.Canny(gray, 15, 90)
         canny = cv2.dilate(canny, kernel, iterations = 1)
         canny = cv2.erode(canny, kernel, iterations = 1)
         cv2.imwrite(os.path.join(floder_path, 'image_after_canny.jpg'), canny)
@@ -103,7 +103,7 @@ def main():
                     # print(approx.shape)
                     for j in approx:
                         # delete points on box boundary, repeated, and on edge of mask
-                        if (j[0,0] > x1+2) and (j[0,1] > y1+2) and (j[0,0] < x2-3) and (j[0,1] < y2-3) and (not camera_mask[j[0][1], j[0][0]]):
+                        if (j[0,0] > x1) and (j[0,1] > y1) and (j[0,0] < x2-1) and (j[0,1] < y2-1) and (not camera_mask[j[0][1], j[0][0]]):
                             corner_box = corner_matrix[j[0,1]-min_d:j[0,1]+min_d+1, j[0,0]-min_d:j[0,0]+min_d+1]
                             if (True not in corner_box):
                                 img = cv2.circle(img, tuple(j[0]), 2, (0,0,255), -1)
@@ -111,6 +111,8 @@ def main():
                     # img = cv2.polylines(img, [approx], True, (0, 0, 255), 2)
         cv2.imwrite(os.path.join(floder_path, 'image_with_marker.jpg'), img)
         np.save(os.path.join(floder_path, 'corners.npy'), corner_matrix)
+        true_coordinates = np.argwhere(corner_matrix)
+        np.save(os.path.join(floder_path, 'corners_(y,x).npy'), true_coordinates)
         # Write video
         if camera == 'f':
             videowriter_f.write(img)
