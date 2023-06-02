@@ -16,18 +16,25 @@ def main():
 
 	print(lines[3])  # Print the 4th entry (index 3)
 	camera_pos = ["f", "fl", "fr", "b"]
+
+	count = 1
 	for pos in camera_pos:
 		print(pos)
 		for i in range(len(lines)):
-			input = cv2.imread("../ITRI_dataset/seq1/dataset/%s/raw_image.jpg" %(lines[i]))
+			# input = cv2.imread("../ITRI_dataset/seq1/dataset/%s/raw_image.jpg" %(lines[i]))
+			input = f"../ITRI_dataset/seq1/dataset/{lines[i]}"
 			with open("../ITRI_dataset/seq1/dataset/%s/camera.csv" %(lines[i]), 'r') as file:
 				camera = file.readline()
 			if (camera == ("/lucid_cameras_x00/gige_100_%s_hdr" % pos)):
-				#print(camera)
-				#print(input.shape)
+				print('\r', end='')
+				print(f'Processing {count}/{len(lines)}', end='')
+				count += 1
+				# print(input)
+				# print(camera)
+				# print(input.shape)
 				#input = cv2.resize(input, (960, 540))
 				#print(input.shape)
-				img, tripoints, kpts, matches = process(input)
+				img, tripoints, kpts, matches = process(input, camera=pos)
 				xyz = pmap.collect_points(tripoints)
 				# Create the new folder
 				folder_path = "./output/%s" % (lines[i])

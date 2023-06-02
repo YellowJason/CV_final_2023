@@ -1,5 +1,5 @@
 from slam import process
-from display import Display
+# from display import Display
 
 import numpy as np
 import open3d as o3d
