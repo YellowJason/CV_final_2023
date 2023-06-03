@@ -44,4 +44,5 @@ Remember to put ITRI_dataset & ITRI_DLC two folder under CV_final_2023/
 
 * 6/3 by 黃政勛  
     修正pinhole model，假設地面和相機看出去的Z軸平行，且距離1.63m
+    ![image](https://github.com/YellowJason/CV_final_2023/blob/main/pinhole_formula.jpg)
     
