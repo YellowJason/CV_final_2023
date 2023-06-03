@@ -41,4 +41,7 @@ Remember to put ITRI_dataset & ITRI_DLC two folder under CV_final_2023/
 
 * 6/2 by 黃政勛  
     將find_corners.py找出的角點合併到SLAM中，SLAM維持原本用兩幀的goodFeatures來找2D->3D的轉換關係，但輸出點雲只輸出corners轉換後的結果(原本是把所有goodFeatures轉過去)。依然有一些問題待解決
+
+* 6/3 by 黃政勛  
+    修正pinhole model，假設地面和相機看出去的Z軸平行，且距離1.63m
     

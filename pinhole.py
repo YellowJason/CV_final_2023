@@ -4,6 +4,7 @@ import argparse
 import os
 import yaml
 import csv
+import matplotlib.pyplot as plt
 
 def main():
     parser = argparse.ArgumentParser(description = 'Read dataset & marker')
@@ -44,33 +45,27 @@ def main():
             camera = camera.split('_')[4] # fl, f, b, fr
             camera = cameras[camera]
         p_matrix = np.array(camera['projection_matrix']['data']).reshape((3,4))
-        Intrinsics = np.array(camera['camera_matrix']['data']).reshape((3,3))
-        trans = np.dot(Intrinsics, p_matrix)
-        print(trans)
-        trans_inv = np.linalg.inv(trans[:,[0,1,2]])
-        # print(trans_inv)
+        # print(p_matrix)
+        # read corners
+        corners = np.load(os.path.join(floder_path, 'corners_(y,x).npy'))
+        # print(corners.shape)
         
-        out_img = np.zeros((h,w,c))
-        xc, yc = np.meshgrid(np.arange(0, w, 1), np.arange(0, h, 1), sparse = False)
-        xrow = xc.reshape((1, w*h))
-        yrow = yc.reshape((1, w*h))
-        onerow = np.ones((1, w*h))
-        M = np.concatenate((xrow, yrow, onerow), axis = 0)
-        
-        Mbar = np.dot(trans_inv, M)
-        Mbar = np.divide(Mbar, Mbar[-1,:])
-        dsty = np.round( Mbar[1,:].reshape((h, w)) ).astype(int)
-        dstx = np.round( Mbar[0,:].reshape((h, w)) ).astype(int) 
+        x_row = corners[:, 1]
+        y_row = corners[:, 0]
 
-        dstx = dstx - np.min(dstx)
-        dstx = dsty - np.min(dsty)
-        print(dstx)
-        h_mask = (0<=dsty)*(dsty<h)
-        w_mask = (0<=dstx)*(dstx<w)
+        dsty = (1.63*p_matrix[1,1]) / (y_row-p_matrix[1,2])
+        dstx = (x_row-p_matrix[0,2]) * (dsty/p_matrix[0,0])
+
+        # dstx = np.round(dstx).astype(int)
+        # dsty = np.round(dsty).astype(int)
+        
+        h_mask = (0<=dsty)*(dsty<=25)
+        w_mask = (-25<=dstx)*(dstx<=25)
         mask   = h_mask*w_mask
-        out_img[dsty[mask], dstx[mask]] = img[yc[mask], xc[mask]]
 
-        cv2.imwrite(os.path.join(floder_path, 'image_top_view.jpg'), out_img)
+        plt.scatter(dstx, dsty, s=3)
+        plt.savefig(os.path.join(floder_path, 'plot.png'))
+        plt.close()
 
 if __name__ == '__main__':
     main()
