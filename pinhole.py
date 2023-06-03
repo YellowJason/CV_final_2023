@@ -55,17 +55,34 @@ def main():
 
         dsty = (1.63*p_matrix[1,1]) / (y_row-p_matrix[1,2])
         dstx = (x_row-p_matrix[0,2]) * (dsty/p_matrix[0,0])
+        # save raw data
+        dstx = dstx.reshape(-1,1)
+        dsty = dsty.reshape(-1,1)
+        xy_origin = np.concatenate((dstx, dsty), axis=1)
+        file_path = os.path.join(floder_path, 'output_raw.csv')
+        np.savetxt(file_path, xy_origin, delimiter=',', fmt='%s')
 
-        # dstx = np.round(dstx).astype(int)
-        # dsty = np.round(dsty).astype(int)
+        dstx_near = []
+        dsty_near = []
+        for i in range(len(dstx)):
+            if (dstx[i] < 100) and (dstx[i] > -100) and (dsty[i] < 100) and (dsty[i] > 0):
+                dstx_near.append(dstx[i])
+                dsty_near.append(dsty[i])
         
-        h_mask = (0<=dsty)*(dsty<=25)
-        w_mask = (-25<=dstx)*(dstx<=25)
-        mask   = h_mask*w_mask
-
+        dstx = np.array(dstx_near).reshape(-1,1)
+        dsty = np.array(dsty_near).reshape(-1,1)
+        dstx = dstx.reshape(-1,1)
+        dsty = dsty.reshape(-1,1)
         plt.scatter(dstx, dsty, s=3)
         plt.savefig(os.path.join(floder_path, 'plot.png'))
         plt.close()
+        
+        z = np.ones((len(dstx), 1)) * 1.63
+        # print(dstx.shape, dsty.shape, z.shape)
+        xyz = np.concatenate((dstx, dsty, z), axis=1)
+        # print(xyz.shape)
+        file_path = os.path.join(floder_path, 'output.csv')
+        np.savetxt(file_path, xyz, delimiter=',', fmt='%s')
 
 if __name__ == '__main__':
     main()
