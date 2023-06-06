@@ -28,15 +28,18 @@ def numpy2pcd(arr):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description = 'Read dataset & marker')
+    parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
+    args = parser.parse_args()
 
-    with open('./ITRI_dataset/seq1/localization_timestamp.txt', 'r') as file:
+    with open(f'./ITRI_dataset/{args.seq}/localization_timestamp.txt', 'r') as file:
         lines = file.readlines()
 
 	# Remove the newline character ('\n') from each line
     lines = [line.strip() for line in lines]
     with open('pred_pose.txt', 'w+') as pred:
         for i in range(len(lines)):
-            path_name = './ITRI_dataset/seq1/dataset/%s' % lines[i]
+            path_name = f'./ITRI_dataset/{args.seq}/dataset/{lines[i]}'
             # Target point cloud
             target = csv_reader(f'{path_name}/sub_map.csv')
             target_pcd = numpy2pcd(target)
