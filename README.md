@@ -11,7 +11,15 @@ Remember to put ITRI_dataset & ITRI_DLC two folder under CV_final_2023/
     python write_timestamp.py  
     python filter_keypoints.py  
     在每個time stamp資料夾裡存filtered_corners_(y,x).npy，存所有角點的(y,x)座標  
-  
+* Pinhole完整流程:  
+    python find_corners.py --seq {seq_num}  
+    python pinhole.py --seq {seq_num}  
+    python combine_4_cam.py --seq {seq_num}  #暫時的  
+    會在每個timestamp資料夾中存:  
+        output.csv: 該timestamp的相機拍到的角點(base link座標)  
+        output_merge.csv: 將附近timestamp 4台相機拍到的角點組合起來(base link座標)  
+        plot.png: 視覺化點雲  
+
 ## Progress
 * 5/30 by 塗兆元  
     write_timestamp:  
@@ -47,5 +55,6 @@ Remember to put ITRI_dataset & ITRI_DLC two folder under CV_final_2023/
     ![image](https://github.com/YellowJason/CV_final_2023/blob/main/pinhole_formula.jpg)
     
 * 6/5 by塗兆元
-    新增find_corners_fill.py，完成角點之間的補點。
+    新增find_corners_fill.py，完成角點之間的補點。  
     
+* 6/6 修正pinhole，可以成功產生base link上的點雲，先用暴力組合四台相機來的出結果  

@@ -43,14 +43,14 @@ if __name__ == '__main__':
 
             # Source point cloud
             #TODO: Read your point cloud here#
-            source = csv_reader(f'{path_name}/output.csv')
+            source = csv_reader(f'{path_name}/output_merge.csv')
             source_pcd = numpy2pcd(source)
 
             # Initial pose
             init_pose = csv_reader(f'{path_name}/initial_pose.csv')
 
             # Implement ICP
-            transformation = ICP(source_pcd, target_pcd, threshold=0.02, init_pose=init_pose)
+            transformation = ICP(source_pcd, target_pcd, threshold=0.5, init_pose=init_pose)
             pred_x = transformation[0,3]
             pred_y = transformation[1,3]
             print(pred_x, pred_y)

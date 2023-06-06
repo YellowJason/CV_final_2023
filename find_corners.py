@@ -66,13 +66,13 @@ def main():
         th = cv2.erode(th, kernel, iterations = 2)
         th = cv2.dilate(th, kernel, iterations = 5)
         # th = cv2.GaussianBlur(th,(7,7), 0)
-        cv2.imwrite(os.path.join(floder_path, 'image_after_threshold.jpg'), th)
+        # cv2.imwrite(os.path.join(floder_path, 'image_after_threshold.jpg'), th)
         
         # Canny
         canny = cv2.Canny(gray, 15, 90)
         canny = cv2.dilate(canny, kernel, iterations = 1)
         canny = cv2.erode(canny, kernel, iterations = 1)
-        cv2.imwrite(os.path.join(floder_path, 'image_after_canny.jpg'), canny)
+        # cv2.imwrite(os.path.join(floder_path, 'image_after_canny.jpg'), canny)
         canny = cv2.bitwise_and(canny, canny, mask=th)
         cv2.imwrite(os.path.join(floder_path, 'image_after_canny_&_mask.jpg'), canny)
 
