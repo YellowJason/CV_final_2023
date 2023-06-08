@@ -22,7 +22,10 @@ def main():
     parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
     args = parser.parse_args()
 
-    seq_path = os.path.join('./ITRI_dataset', args.seq)
+    if args.seq in ['seq1', 'seq2', 'seq3']:
+        seq_path = os.path.join('./ITRI_dataset', args.seq)
+    elif args.seq in ['test1', 'test2']:
+        seq_path = os.path.join('./ITRI_DLC', args.seq)
 
     # file of all time stamp
     time_stamp_path = os.path.join(seq_path, 'all_timestamp.txt')
@@ -101,7 +104,8 @@ def main():
 
         # Find the cross point with ground
         xyz_in_base = xyz_in_base * -1.63 / xyz_in_base[:, 2].reshape((-1,1))
-
+        # Shift origin
+        xyz_in_base = xyz_in_base + origin
         # print(xyz_in_base)
         near_point = []
         min_d = 15
@@ -111,12 +115,12 @@ def main():
                 near_point.append(xyz_in_base[i])
         near_point = np.array(near_point)
         print('Point number:', near_point.shape, end = '')
-        if len(near_point) != 0:
-            plt.scatter(near_point[:,0], near_point[:,1], s=3)
-            plt.xlim([-min_d, min_d])
-            plt.ylim([-min_d, min_d])
-            plt.savefig(os.path.join(floder_path, 'plot.png'))
-            plt.close()
+        # if len(near_point) != 0:
+        #     plt.scatter(near_point[:,0], near_point[:,1], s=2)
+        #     plt.xlim([-min_d, min_d])
+        #     plt.ylim([-min_d, min_d])
+        #     plt.savefig(os.path.join(floder_path, 'plot.png'))
+        #     plt.close()
         
         file_path = os.path.join(floder_path, 'output.csv')
         np.savetxt(file_path, near_point, delimiter=',', fmt='%s')

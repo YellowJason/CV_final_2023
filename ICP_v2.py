@@ -8,11 +8,12 @@ def ICP(source, target, threshold, init_pose, iteration=30):
     # implement iterative closet point and return transformation matrix
     reg_p2p = o3d.pipelines.registration.registration_icp(
         source, target, threshold, init_pose,
-        o3d.pipelines.registration.TransformationEstimationPointToPoint(),
-        o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=iteration)
+        estimation_method = o3d.pipelines.registration.TransformationEstimationPointToPoint(),
+        criteria = o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=iteration)
     )
     print(reg_p2p)
-    print(reg_p2p.transformation)
+    assert len(reg_p2p.correspondence_set) != 0, 'The size of correspondence_set between your point cloud and sub_map should not be zero.'
+    #print(reg_p2p.transformation)
     return reg_p2p.transformation
 
 def csv_reader(filename):
@@ -32,14 +33,24 @@ if __name__ == '__main__':
     parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
     args = parser.parse_args()
 
-    with open(f'./ITRI_dataset/{args.seq}/localization_timestamp.txt', 'r') as file:
+    with open(f'./ITRI_DLC2/{args.seq}/localization_timestamp.txt', 'r') as file:
         lines = file.readlines()
-
-	# Remove the newline character ('\n') from each line
+    
+    # Remove the newline character ('\n') from each line
     lines = [line.strip() for line in lines]
-    with open('pred_pose.txt', 'w+') as pred:
+    
+    if args.seq in ['seq1', 'seq2', 'seq3']:
+        out_path = f'./ITRI_dataset/{args.seq}/pred_pose.txt'
+    elif args.seq in ['test1', 'test2']:
+        out_path = f'./solution/{args.seq}/pred_pose.txt'
+    
+    with open(out_path, 'w+') as pred:
         for i in range(len(lines)):
-            path_name = f'./ITRI_dataset/{args.seq}/dataset/{lines[i]}'
+            if args.seq in ['seq1', 'seq2', 'seq3']:
+                path_name = f'./ITRI_dataset/{args.seq}/dataset/{lines[i]}'
+            elif args.seq in ['test1', 'test2']:
+                path_name = f'./ITRI_DLC/{args.seq}/dataset/{lines[i]}'
+            path_name2 = f'./ITRI_DLC2/{args.seq}/new_init_pose/{lines[i]}'
             # Target point cloud
             target = csv_reader(f'{path_name}/sub_map.csv')
             target_pcd = numpy2pcd(target)
@@ -50,14 +61,14 @@ if __name__ == '__main__':
             source_pcd = numpy2pcd(source)
 
             # Initial pose
-            init_pose = csv_reader(f'{path_name}/initial_pose.csv')
+            init_pose = csv_reader(f'{path_name2}/initial_pose.csv')
 
             # Implement ICP
             transformation = ICP(source_pcd, target_pcd, threshold=0.5, init_pose=init_pose)
             pred_x = transformation[0,3]
             pred_y = transformation[1,3]
-            print(pred_x, pred_y)
+            # print(pred_x, pred_y)
             pred.write(str(pred_x))
-            pred.write(",")
+            pred.write(" ")
             pred.write(str(pred_y))
             pred.write("\n")
