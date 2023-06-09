@@ -17,11 +17,7 @@ rotation_fl_f = Rotation.from_quat(qs['fl_2_f'])
 rotation_fr_f = Rotation.from_quat(qs['fr_2_f'])
 rotation_f_base = Rotation.from_quat(qs['f_2_base'])
 
-def main():
-    parser = argparse.ArgumentParser(description = 'Read dataset & marker')
-    parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
-    args = parser.parse_args()
-
+def pinhole(args):
     if args.seq in ['seq1', 'seq2', 'seq3']:
         seq_path = os.path.join('./ITRI_dataset', args.seq)
     elif args.seq in ['test1', 'test2']:
@@ -46,7 +42,7 @@ def main():
     for i in range(len(lines)):
         line = lines[i] 
         print('\r', end='')
-        print(f'Processing {i+1}/{len(lines)}', end=' ')
+        print(f'Running pinhole {i+1}/{len(lines)}', end=' ')
         floder_path = os.path.join(seq_path, 'dataset', line[:-1]) # remove '\n'
         # read image
         img = cv2.imread(os.path.join(floder_path, 'raw_image.jpg')).astype('uint8')
@@ -124,6 +120,10 @@ def main():
         
         file_path = os.path.join(floder_path, 'output.csv')
         np.savetxt(file_path, near_point, delimiter=',', fmt='%s')
+    print('')
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description = 'Read dataset & marker')
+    parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
+    args = parser.parse_args()
+    pinhole(args)

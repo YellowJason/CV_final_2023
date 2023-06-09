@@ -7,10 +7,7 @@ import csv
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation
 
-def main():
-    parser = argparse.ArgumentParser(description = 'Read dataset & marker')
-    parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
-    args = parser.parse_args()
+def combine(args):
 
     if args.seq in ['seq1', 'seq2', 'seq3']:
         seq_path = os.path.join('./ITRI_dataset', args.seq)
@@ -71,7 +68,7 @@ def main():
         line_2 = lines[i-2] 
         line_3 = lines[i-3]
         print('\r', end='')
-        print(f'Processing {i+1}/{len(lines)}', end=' ')
+        print(f'Combine four cameras {i+1}/{len(lines)}', end=' ')
         floder_path_0 = os.path.join(seq_path, 'dataset', line_0[:-1])
         floder_path_1 = os.path.join(seq_path, 'dataset', line_1[:-1])
         floder_path_2 = os.path.join(seq_path, 'dataset', line_2[:-1])
@@ -99,5 +96,9 @@ def main():
         # plt.close()
         
         np.savetxt(os.path.join(floder_path_0, 'output_merge.csv'), xyz, delimiter=',', fmt='%s')
+    print('')
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description = 'Read dataset & marker')
+    parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
+    args = parser.parse_args()
+    combine(args)

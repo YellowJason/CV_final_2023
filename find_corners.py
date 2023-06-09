@@ -5,11 +5,7 @@ import os
 import csv
 import cv2.ximgproc as xip
 
-def main():
-    parser = argparse.ArgumentParser(description = 'Read dataset & marker')
-    parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
-    args = parser.parse_args()
-
+def find_corners(args):
     if args.seq in ['seq1', 'seq2', 'seq3']:
         seq_path = os.path.join('./ITRI_dataset', args.seq)
     elif args.seq in ['test1', 'test2']:
@@ -30,7 +26,7 @@ def main():
     for i in range(len(lines)):
         line = lines[i] 
         print('\r', end='')
-        print(f'Processing {i+1}/{len(lines)}', end='')
+        print(f'Finding corners {i+1}/{len(lines)}', end='')
         floder_path = os.path.join(seq_path, 'dataset', line[:-1]) # remove '\n'
         # read image
         img = cv2.imread(os.path.join(floder_path, 'raw_image.jpg')).astype('uint8')
@@ -129,6 +125,10 @@ def main():
     videowriter_b.release()
     videowriter_fr.release()
     videowriter_fl.release()
+    print('')
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description = 'Read dataset & marker')
+    parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
+    args = parser.parse_args()
+    find_corners(args)

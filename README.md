@@ -3,10 +3,12 @@ Computer vision final project in NTU, 2023
 Remember to put ITRI_dataset & ITRI_DLC two folder under CV_final_2023/
 
 ## Usage
+* 完整流程:  
+    python all_step.py --seq {seq_num}  
+    ICP需另外跑: python ICP_v2.py --seq {seq_num}  
 * 找角點:  
     python find_corners.py --seq {seq_num}  
     在每個time stamp資料夾裡存corners.npy，是一個928*1440的boolean array，代表該pixel是否是角點  
-  
 * 過濾角點:  
     python write_timestamp.py  
     python filter_keypoints.py  
