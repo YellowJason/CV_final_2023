@@ -1,6 +1,9 @@
 # CV_final_2023
 Computer vision final project in NTU, 2023  
-Remember to put ITRI_dataset & ITRI_DLC two folder under CV_final_2023/
+Remember to put following folders under CV_final_2023/  
+* ITRI_dataset  
+* ITRI_DLC  
+* ITRI_DLC2  
 
 ## Usage
 * 完整流程:  
