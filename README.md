@@ -8,6 +8,11 @@ Remember to put following folders under CV_final_2023/
 ## Usage
 * 完整流程:  
     python all_step.py --seq {seq_num}  
+    等同於三個分開跑:  
+    python find_corners.py --seq {seq_num}  
+    python pinhole.py --seq {seq_num}  
+    python combine_4_cam.py --seq {seq_num}  
+      
     ICP需另外跑: python ICP_v2.py --seq {seq_num}  
 * 找角點:  
     python find_corners.py --seq {seq_num}  
@@ -16,8 +21,7 @@ Remember to put following folders under CV_final_2023/
     python write_timestamp.py  
     python filter_keypoints.py  
     在每個time stamp資料夾裡存filtered_corners_(y,x).npy，存所有角點的(y,x)座標  
-* Pinhole完整流程:  
-    python find_corners.py --seq {seq_num}  
+* Pinhole:  
     python pinhole.py --seq {seq_num}  
     python combine_4_cam.py --seq {seq_num}  #暫時的  
     會在每個timestamp資料夾中存:  
