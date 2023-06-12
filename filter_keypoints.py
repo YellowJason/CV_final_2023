@@ -8,7 +8,10 @@ def main():
     parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
     args = parser.parse_args()
 
-    seq_path = os.path.join('./ITRI_dataset', args.seq)
+    if args.seq in ['seq1', 'seq2', 'seq3']:
+        seq_path = os.path.join('./ITRI_dataset', args.seq)
+    elif args.seq in ['test1', 'test2']:
+        seq_path = os.path.join('./ITRI_DLC', args.seq)
 
     # file of diff cam timestamp
     f_timestamp_file = open(os.path.join(seq_path, 'f_timestamp.txt'), 'r')
@@ -75,6 +78,11 @@ def main():
             # cv2.imwrite(os.path.join(frame_now, 'image_after_forward_l1.jpg'), img_l1_to_n)
             
             out = modify_matrix(np.logical_or(corners_f1_to_n, corners_l1_to_n), corners_n)
+            # kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (41, 41))
+            # mask = np.logical_or(corners_f1_to_n, corners_l1_to_n)
+            # mask = cv2.dilate(np.float32(mask), kernel)
+            # cv2.imwrite(os.path.join(frame_now, 'mask.jpg'), mask*255)
+            # out = np.logical_or(corners_n.astype(bool), mask.astype(bool))
 
             img = cv2.imread(os.path.join(frame_now, 'raw_image.jpg')).astype('uint8')
             img_video = cv2.imread(os.path.join(frame_now, 'raw_image.jpg')).astype('uint8')

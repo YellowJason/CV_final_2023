@@ -4,10 +4,9 @@ import numpy as np
 
 def calculate_dist(label, pred):
     assert label.shape[0] == pred.shape[0], 'The number of predicted results should be the same as the number of ground truth.'
-    for i in range(label.shape[0]):
-
-        print("Ground  truth: ", label[i])
-        print("Predict truth:", pred[i])
+    # for i in range(label.shape[0]):
+    #     print("Ground  truth: ", label[i])
+    #     print("Predict truth:", pred[i])
 
     dist = np.sqrt(np.sum((label-pred)**2, axis=1))
     dist = np.mean(dist)

@@ -5,12 +5,11 @@ import os
 import csv
 # import cv2.ximgproc as xip
 
-def main():
-    parser = argparse.ArgumentParser(description = 'Read dataset & marker')
-    parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
-    args = parser.parse_args()
-
-    seq_path = os.path.join('./ITRI_dataset', args.seq)
+def corner_fill(args):
+    if args.seq in ['seq1', 'seq2', 'seq3']:
+        seq_path = os.path.join('./ITRI_dataset', args.seq)
+    elif args.seq in ['test1', 'test2']:
+        seq_path = os.path.join('./ITRI_DLC', args.seq)
 
     # file of all time stamp
     time_stamp_path = os.path.join(seq_path, 'all_timestamp.txt')
@@ -66,15 +65,15 @@ def main():
         th = cv2.erode(th, kernel, iterations = 2)
         th = cv2.dilate(th, kernel, iterations = 2)
         th = cv2.GaussianBlur(th,(7,7), 0)
-        cv2.imwrite(os.path.join(floder_path, 'image_after_threshold.jpg'), th)
+        # cv2.imwrite(os.path.join(floder_path, 'image_after_threshold.jpg'), th)
         
         # Canny
         canny = cv2.Canny(gray, 20, 90)
         canny = cv2.dilate(canny, kernel, iterations = 1)
         canny = cv2.erode(canny, kernel, iterations = 1)
-        cv2.imwrite(os.path.join(floder_path, 'image_after_canny.jpg'), canny)
+        # cv2.imwrite(os.path.join(floder_path, 'image_after_canny.jpg'), canny)
         canny = cv2.bitwise_and(canny, canny, mask=th)
-        cv2.imwrite(os.path.join(floder_path, 'image_after_canny_&_mask.jpg'), canny)
+        # cv2.imwrite(os.path.join(floder_path, 'image_after_canny_&_mask.jpg'), canny)
 
         # read marker
         marker_f = open(os.path.join(floder_path, 'detect_road_marker.csv'), 'r')
@@ -137,6 +136,8 @@ def main():
                                         
         cv2.imwrite(os.path.join(floder_path, 'image_with_marker.jpg'), img)
         np.save(os.path.join(floder_path, 'corners.npy'), corner_matrix)
+        true_coordinates = np.argwhere(corner_matrix)
+        np.save(os.path.join(floder_path, 'corners_(y,x).npy'), true_coordinates)
         # Write video
         if camera == 'f':
             videowriter_f.write(img)
@@ -153,4 +154,7 @@ def main():
     videowriter_fl.release()
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description = 'Read dataset & marker')
+    parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
+    args = parser.parse_args()
+    corner_fill(args)

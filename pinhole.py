@@ -58,6 +58,7 @@ def pinhole(args):
         # print(p_matrix)
         # read corners
         corners = np.load(os.path.join(floder_path, 'corners_(y,x).npy'))
+        # corners = np.load(os.path.join(floder_path, 'filtered_corners_(y,x).npy'))
         # print(corners.shape)
         
         x_row = corners[:, 1]

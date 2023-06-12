@@ -10,7 +10,10 @@ def main():
     parser.add_argument('--seq', default = 'seq1', type=str, help = 'Which sequence do you want to read')
     args = parser.parse_args()
 
-    seq_path = os.path.join('./ITRI_dataset', args.seq)
+    if args.seq in ['seq1', 'seq2', 'seq3']:
+        seq_path = os.path.join('./ITRI_dataset', args.seq)
+    elif args.seq in ['test1', 'test2']:
+        seq_path = os.path.join('./ITRI_DLC', args.seq)
 
     # file of all time stamp
     time_stamp_path = os.path.join(seq_path, 'all_timestamp.txt')

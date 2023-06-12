@@ -37,18 +37,22 @@ def combine(args):
         floder_path_3 = os.path.join(seq_path, 'dataset', line_3[:-1])
         # read point clouds
         f = open(os.path.join(floder_path_0, 'output.csv'), 'r')
-        xyz_0 = np.array(list(csv.reader(f))).reshape(-1,3)
+        xyz_0 = np.array(list(csv.reader(f))).reshape(-1,3).astype(float)
         f = open(os.path.join(floder_path_1, 'output.csv'), 'r')
-        xyz_1 = np.array(list(csv.reader(f))).reshape(-1,3)
+        xyz_1 = np.array(list(csv.reader(f))).reshape(-1,3).astype(float)
         f = open(os.path.join(floder_path_2, 'output.csv'), 'r')
-        xyz_2 = np.array(list(csv.reader(f))).reshape(-1,3)
+        xyz_2 = np.array(list(csv.reader(f))).reshape(-1,3).astype(float)
         f = open(os.path.join(floder_path_3, 'output.csv'), 'r')
-        xyz_3 = np.array(list(csv.reader(f))).reshape(-1,3)
+        xyz_3 = np.array(list(csv.reader(f))).reshape(-1,3).astype(float)
         xyz = np.concatenate((xyz_0,xyz_1,xyz_2,xyz_3), axis=0)
         # print(xyz_0.shape, xyz_1.shape, xyz_2.shape, xyz_3.shape, xyz.shape)
         
         min_d = 15
-        # plt.scatter(xyz[:,0], xyz[:,1], s=2)
+        
+        # plt.scatter(xyz_0[:,0], xyz_0[:,1], c='red', s=2)
+        # plt.scatter(xyz_1[:,0], xyz_1[:,1], c='blue', s=2)
+        # plt.scatter(xyz_2[:,0], xyz_2[:,1], c='orange', s=2)
+        # plt.scatter(xyz_3[:,0], xyz_3[:,1], c='green', s=2)
         # plt.xlim([-min_d, min_d])
         # plt.ylim([-min_d, min_d])
         # plt.savefig(os.path.join(floder_path_0, 'plot_merge.png'))
