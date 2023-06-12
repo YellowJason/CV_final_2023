@@ -3,7 +3,6 @@ import cv2
 import argparse
 import os
 import csv
-import cv2.ximgproc as xip
 
 def find_corners(args):
     if args.seq in ['seq1', 'seq2', 'seq3']:
@@ -58,7 +57,6 @@ def find_corners(args):
         # Filter out white part by threshold
         # gray = cv2.GaussianBlur(gray,(3,3), 0)
         # gray = cv2.bilateralFilter(gray, 15, 20, 20)
-        # gray = xip.jointBilateralFilter(img, gray, 30, 5, 5)
         # cv2.imwrite(os.path.join(floder_path, 'gray_after_jbf.jpg'), gray)
         th = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 121, -10)
         th = cv2.dilate(th, kernel, iterations = 2)

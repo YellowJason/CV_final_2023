@@ -1,11 +1,7 @@
 import numpy as np
-import cv2
 import argparse
 import os
-import yaml
 import csv
-import matplotlib.pyplot as plt
-from scipy.spatial.transform import Rotation
 
 def combine(args):
 
