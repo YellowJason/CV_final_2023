@@ -14,7 +14,7 @@ Remember to put following folders under CV_final_2023/
     python all_step.py --seq {seq_num}  
     python ICP_v2.py --seq {seq_num}  
       
-    all_stwp.py 等同於以下三個分開跑:  
+    all_step.py 等同於以下三個分開跑:  
     python find_corners.py --seq {seq_num}  
     python pinhole.py --seq {seq_num}  
     python combine_4_cam.py --seq {seq_num}  
