@@ -100,8 +100,9 @@ def pinhole(args):
         # print(camera_name, origin)
 
         # Find the cross point with ground
-        xyz_in_base = xyz_in_base * -1.63 / xyz_in_base[:, 2].reshape((-1,1))
+        xyz_in_base = xyz_in_base * (-1.63) / xyz_in_base[:, 2].reshape((-1,1))
         # Shift origin
+        origin[2] = 0
         xyz_in_base = xyz_in_base + origin
         # print(xyz_in_base)
         near_point = []
