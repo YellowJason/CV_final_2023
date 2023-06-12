@@ -10,6 +10,7 @@ Remember to put following folders under CV_final_2023/
 * pip install -r requirements.txt
 
 ## Usage
+{seq_num} = seq1, seq2, seq3, test1, test2  
 * 完整流程:  
     python all_step.py --seq {seq_num}  
     python ICP_v2.py --seq {seq_num}  
